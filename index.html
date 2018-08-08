@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>design-state</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+</head>
+<body>
+<div id="#root"></div>
+<script>
+  const events  = {
+    STOP: 'Stopped',
+    PLAY: 'Playing',
+    REWIND: 'Rewinding',
+    FASTFORWARD: 'FastForwarding'
+  };
+
+  class Walkman extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        current: events.STOP
+      };
+      this.transition = this.transition.bind(this);
+    }
+
+    transition (target) {
+      // 当且仅当当前的状态为停止的时候，才可以进行前进、倒退、或开启。
+      const preventTapeJam = (
+        ['REWIND', 'FASTFORWARD', 'PLAY'].includes(target) && this.state.current === 'stopped'
+      );
+
+      if (!preventTapeJam) {
+        this.setState({
+          current: events[target]
+        });
+      }
+    }
+
+    render() {
+      const Button = ({ children, event, active }) => (
+        React.createElement('button', {
+          onClick: () => this.transition(event)
+        }, children)
+      );
+
+      return (
+        React.createElement('div', null,
+          React.createElement('div', null, this.state.current),
+          React.createElement(Button, { event: 'STOP' }, '■'),
+          React.createElement(Button, { event: 'PLAY' }, '▶'),
+          React.createElement(Button, { event: 'REWIND' }, '◀◀'),
+          React.createElement(Button, { event: 'FASTFORWARD' }, '▶▶'),
+        )
+      );
+    }
+  }
+
+  ReactDOM.render(
+    React.createElement(Walkman),
+    document.getElementById('#root')
+  );
+</script>
+</body>
+</html>
